@@ -16,14 +16,20 @@ import UserNotifications
 import sdlrkx
 
 
-class MEDLOnboardingViewController: RKViewController {
+class MEDLOnboardingViewController: UIViewController {
     
     @IBOutlet weak var startButton: UIButton!
     let kActivityIdentifiers = "activity_identifiers"
     var notifItem: RSAFScheduleItem!
+    var medlFullAssessmentItem: RSAFScheduleItem!
+    var medlSpotAssessmentItem: RSAFScheduleItem!
+    let delegate = UIApplication.shared.delegate as! AppDelegate
+    var store: RSStore!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.store = RSStore()
         
 //        let color = UIColor.init(colorLiteralRed: 0.44, green: 0.66, blue: 0.86, alpha: 1.0)
 //        startButton.layer.borderWidth = 1.0
@@ -73,30 +79,65 @@ class MEDLOnboardingViewController: RKViewController {
                 }
                 
                 
+                if(item.identifier == "medl_full"){
+                    
+                    let date = Date()
+                    
+                    self?.store.setValueInState(value: date as NSSecureCoding, forKey: "dateFull")
+
+                    var chosen : [String] = []
+                    
+                    if let chosenMedications: [String]? = taskResult.results?.flatMap({ (stepResult) in
+                        if let stepResult = stepResult as? ORKStepResult,
+                            stepResult.identifier.hasPrefix("medl_full."),
+                            let choiceResult = stepResult.firstResult as? ORKChoiceQuestionResult,
+                            let answers = choiceResult.choiceAnswers
+                        {
+                            NSLog("answer")
+                            NSLog(String(describing:answers))
+                            
+                            for each in answers {
+                                chosen.append(each as! String)
+                            }
+                            
+                            
+                        }
+                        return nil
+                    }) {
+                        
+                        NSLog("chosen")
+                        NSLog(String(describing: chosen))
+                        
+                        self?.store.setValueInState(value: chosen as NSSecureCoding, forKey: "activity_identifiers")
+                        
+                    }
+                    
+                }
+                
+                
             }
             
             self?.dismiss(animated: true, completion: {
                 
-                // launch full
                 
                 if(item.identifier == "notification_date"){
-                    guard let steps = try! MEDLFullAssessmentCategoryStep.create(identifier: "MEDL Full Assessment Identifier", propertiesFileName: "MEDL") else {
-                        return
-                    }
                     
-                    let task = ORKOrderedTask(identifier: "MEDL Full Assessment Identifier", steps: steps)
-                    
-                    self?.launchAssessmentForTask(task)
-                    
-                    // launch spot
-                    
-//                    guard let step = try! MEDLSpotAssessmentStep.create(identifier: "MEDL Spot Assessment Identifier", propertiesFileName: "MEDL", itemIdentifiers: self?.loadMedicationsForSpotAssessment()) else {
-//                        return
-//                    }
-//                    
-//                    let task_spot = ORKOrderedTask(identifier: "MEDL Spot Assessment", steps: [step])
-//                    
-//                    self?.launchAssessmentForTask(task_spot)
+                    self!.medlFullAssessmentItem = AppDelegate.loadScheduleItem(filename:"medl_full")
+                    self?.launchActivity(forItem: (self?.medlFullAssessmentItem)!)
+          
+                }
+                
+                
+                if(item.identifier == "medl_full"){
+                    self!.medlSpotAssessmentItem = AppDelegate.loadScheduleItem(filename:"medl_spot")
+                    self?.launchActivity(forItem: (self?.medlSpotAssessmentItem)!)
+                }
+                
+                if(item.identifier == "medl_spot"){
+                    self?.store.setValueInState(value: false as NSSecureCoding, forKey: "shouldDoSpot")
+                    let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+                    let vc = storyboard.instantiateInitialViewController()
+                    appDelegate.transition(toRootViewController: vc!, animated: true)
                 }
                 
                 

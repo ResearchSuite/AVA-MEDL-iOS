@@ -173,6 +173,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Make sure to include all step generators needed for your survey steps here
     open class var stepGeneratorServices: [RSTBStepGenerator] {
         return [
+            MEDLFullStepGenerator(),
+            MEDLSpotStepGenerator(),
             YADLFullStepGenerator(),
             YADLSpotStepGenerator(),
             RSTBLocationStepGenerator(),

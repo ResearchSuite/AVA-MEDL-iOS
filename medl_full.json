@@ -1,0 +1,126 @@
+{
+    "type": "recurring",
+    "identifier": "medl_full",
+    "title": "MEDL",
+    "guid": "medl-1",
+    "activity": {
+        "type"      : "elementList",
+        "identifier": "MEDLFullTask",
+        "elements"   : [
+                        {
+                        "identifier"   : "introduction",
+                        "type"         : "instruction",
+                        "title"        : "Welcome to the MEDL Full Assessment",
+                        "text"         : ""
+                        },
+                        {
+                        "identifier": "medl_full",
+                        "type": "MEDLFullAssessment",
+                        "text": "Did you use any of these to manage your back pain during the last month?",
+                        "somethingSelectedButtonColor":"#FCC103",
+                        "nothingSelectedButtonColor":"#FCC103",
+                        "itemCellTextBackgroundColor": "#FCC103",
+                        "itemCellSelectedColor":"#7FEE7D",
+                        "itemCellSelectedOverlayImageTitle":"first_tab",
+                        "itemsPerRow":2,
+                        "itemMinSpacing":10.0,
+                        "items": [
+                                  {
+                                  "identifier": "Motrin",
+                                  "generalDescription": "ibuprofen",
+                                  "specificDescription": "Motrin",
+                                  "imageTitle": "motrin",
+                                  "category": "NSAID"
+                                  },
+                                  {
+                                  "identifier": "Advil",
+                                  "generalDescription": "ibuprofen",
+                                  "specificDescription": "Advil",
+                                  "imageTitle": "advil",
+                                  "category": "NSAID"
+                                  },
+                                  {
+                                  "identifier": "Aleve",
+                                  "generalDescription": "naproxen",
+                                  "specificDescription": "Aleve",
+                                  "imageTitle": "aleve",
+                                  "category": "NSAID"
+                                  },
+                                  
+                                  {
+                                  "identifier": "Flexeril",
+                                  "generalDescription": "cyclobenzaprine",
+                                  "specificDescription": "Flexeril",
+                                  "imageTitle": "cyclobenzaprine",
+                                  "category": "Muscle Relaxants"
+                                  },
+                                  {
+                                  "identifier": "Robaxin",
+                                  "generalDescription": "methocarbamol",
+                                  "specificDescription": "Robaxin",
+                                  "imageTitle": "methocarbamol",
+                                  "category": "Muscle Relaxants"
+                                  },
+                                  {
+                                  "identifier": "Soma",
+                                  "generalDescription": "carisoprodol",
+                                  "specificDescription": "Soma",
+                                  "imageTitle": "Soma",
+                                  "category": "Muscle Relaxants"
+                                  },
+                                  
+                                  {
+                                  "identifier": "Ultram",
+                                  "generalDescription": "tramadol",
+                                  "specificDescription": "Ultram",
+                                  "imageTitle": "tramadol",
+                                  "category": "Opioids"
+                                  },
+                                  {
+                                  "identifier": "Codeine",
+                                  "generalDescription": "",
+                                  "specificDescription": "Codeine",
+                                  "imageTitle": "codeine",
+                                  "category": "Opioids"
+                                  },
+                                  {
+                                  "identifier": "Zohydro ER",
+                                  "generalDescription": "hydrocodone",
+                                  "specificDescription": "Zohydro ER",
+                                  "imageTitle": "hydrocodone",
+                                  "category": "Opioids"
+                                  },
+                                  
+                                  {
+                                  "identifier": "Yoga",
+                                  "generalDescription": "",
+                                  "specificDescription": "Yoga",
+                                  "imageTitle": "Yoga",
+                                  "category": "Activities"
+                                  },
+                                  {
+                                  "identifier": "Swimming",
+                                  "generalDescription": "",
+                                  "specificDescription": "Swimming",
+                                  "imageTitle": "swimming",
+                                  "category": "Activities"
+                                  },
+                                  {
+                                  "identifier": "Meditation",
+                                  "generalDescription": "",
+                                  "specificDescription": "Meditation",
+                                  "imageTitle": "Meditation",
+                                  "category": "Activities"
+                                  }
+                                  
+                                  
+                                  ]
+                        }
+                        
+                        
+                        ]
+    },
+    "resultTransforms": [
+    
+    ]
+}

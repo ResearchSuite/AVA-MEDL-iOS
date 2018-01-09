@@ -15,76 +15,153 @@ import UserNotifications
 import sdlrkx
 
 
-class MEDLViewController: RKViewController {
-
+class MEDLViewController: UIViewController {
+    
+    
+    @IBOutlet weak var settingsButton: UIBarButtonItem!
+    var store: RSStore!
+    let kActivityIdentifiers = "activity_identifiers"
+    let delegate = UIApplication.shared.delegate as! AppDelegate
+    var medlFullAssessmentItem: RSAFScheduleItem!
+    var medlSpotAssessmentItem: RSAFScheduleItem!
+    
+    @IBOutlet
+    var tableView: UITableView!
+    
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        
+        self.store = RSStore()
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        let shouldDoSpot = self.delegate.store.get(key: "shouldDoSpot") as! Bool
+        let shouldDoSpot = self.store.get(key: "shouldDoSpot") as! Bool
         
         if (shouldDoSpot) {
             
-           // self.launchSpotAssessment() //launching full now
-            self.launchMEDLAssessment()
-        }
-    
-    }
-
-    func launchSpotAssessment() {
-        guard let steps = try! MEDLFullAssessmentCategoryStep.create(identifier: "MEDL Full Assessment Identifier", propertiesFileName: "MEDL") else {
-            return
+            self.launchSpotAssessment()
         }
         
-        let task = ORKOrderedTask(identifier: "MEDL Full Assessment Identifier", steps: steps)
-        
-        self.launchAssessmentForTask(task)
+        self.shouldDoFullAssessment()
     }
     
-    func launchMEDLAssessment() {
-        guard let steps = try! MEDLFullAssessmentCategoryStep.create(identifier: "MEDL Full Assessment Identifier", propertiesFileName: "MEDL") else {
-            return
-        }
+    func shouldDoFullAssessment () {
         
-        let task = ORKOrderedTask(identifier: "MEDL Full Assessment Identifier", steps: steps)
-
+        let currentDate = Date()
         
-        let tvc = RSAFTaskViewController(activityUUID: UUID(), task: task, taskFinishedHandler: { [weak self] (taskViewController, reason, error) in
+        // Implement should do full assessment
+        let fullDate = self.store.valueInState(forKey: "dateFull")
+        
+        let calendar = NSCalendar.current
+        let components = NSDateComponents()
+        components.day = 28
+        
+        
+        if(fullDate != nil){
+            let futureDate = calendar.date(byAdding: components as DateComponents, to: fullDate as! Date)
             
-            guard reason == ORKTaskViewControllerFinishReason.completed else {
-                self?.dismiss(animated: true, completion: nil)
+            if futureDate! <= currentDate {
+                
+                self.launchFullAssessment()
+                
+            }
+        }
+    }
+    
+    func launchSpotAssessment() {
+        self.medlSpotAssessmentItem = AppDelegate.loadScheduleItem(filename: "medl_spot")
+        self.launchActivity(forItem: medlSpotAssessmentItem)
+    }
+    
+    func launchFullAssessment () {
+        self.medlFullAssessmentItem = AppDelegate.loadScheduleItem(filename: "medl_full")
+        self.launchActivity(forItem: medlFullAssessmentItem)
+        
+    }
+    
+    func launchActivity(forItem item: RSAFScheduleItem) {
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let steps = appDelegate.taskBuilder.steps(forElement: item.activity as JsonElement) else {
                 return
+        }
+        
+        let task = ORKOrderedTask(identifier: item.identifier, steps: steps)
+        
+        let taskFinishedHandler: ((ORKTaskViewController, ORKTaskViewControllerFinishReason, Error?) -> ()) = { [weak self] (taskViewController, reason, error) in
+            //when finised, if task was successful (e.g., wasn't canceled)
+            //process results
+            if reason == ORKTaskViewControllerFinishReason.completed {
+                let taskResult = taskViewController.result
+                appDelegate.resultsProcessor.processResult(taskResult: taskResult, resultTransforms: item.resultTransforms)
+                
+                if(item.identifier == "medl_spot") {
+                    self?.store.set(value: false as NSSecureCoding, key: "shouldDoSpot")
+                    
+                }
+                
+                
+                if(item.identifier == "medl_full"){
+                    
+                    let date = Date()
+                    
+                    self?.store.setValueInState(value: date as NSSecureCoding, forKey: "fullDate")
+
+                    
+                    var chosen : [String] = []
+                    
+                    if let chosenMedications: [String]? = taskResult.results?.flatMap({ (stepResult) in
+                        if let stepResult = stepResult as? ORKStepResult,
+                            stepResult.identifier.hasPrefix("medl_full."),
+                            let choiceResult = stepResult.firstResult as? ORKChoiceQuestionResult,
+                            let answers = choiceResult.choiceAnswers
+                        {
+                            NSLog("answer")
+                            NSLog(String(describing:answers))
+                            
+                            for each in answers {
+                                chosen.append(each as! String)
+                            }
+                            
+                            
+                        }
+                        return nil
+                    }) {
+                        
+                        NSLog("chosen")
+                        NSLog(String(describing: chosen))
+                        
+                        self?.store.setValueInState(value: chosen as NSSecureCoding, forKey: "activity_identifiers")
+                        
+                    }
+                    
+                }
             }
             
-//            let taskResult = taskViewController.result
-//            let result = taskResult.stepResult
-          
-//            if (result.identifier.hasPrefix("MEDL Full Assessment Identifier."))! {
-//                let answer = result.firstResult as? ORKChoiceQuestionResult
-//                NSLog("answer",answer ?? "nill")
-//            }
-//   
-            
-            //AppDelegate.appDelegate.resultsProcessor.processResult(taskResult: taskResult, resultTransforms: activity.resultTransforms)
-            
-            self?.dismiss(animated: true, completion: {
-               // self?.delegate.store.set(value: false as NSSecureCoding, key: "shouldDoDaily")
-                
-            })
-            
-        })
+            self?.dismiss(animated: true, completion: nil)
+        }
+        
+        let tvc = RSAFTaskViewController(
+            activityUUID: UUID(),
+            task: task,
+            taskFinishedHandler: taskFinishedHandler
+        )
         
         self.present(tvc, animated: true, completion: nil)
         
-
     }
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 }
 
