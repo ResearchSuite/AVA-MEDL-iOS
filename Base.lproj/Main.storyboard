@@ -32,6 +32,9 @@
                                     <navigationItem title="MEDL" id="sb1-Kh-fgr">
                                         <barButtonItem key="rightBarButtonItem" title="Settings" id="gb9-cL-D7F">
                                             <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <connections>
+                                                <segue destination="lbK-4U-RCW" kind="presentation" id="02r-nO-st0"/>
+                                            </connections>
                                         </barButtonItem>
                                     </navigationItem>
                                 </items>
@@ -68,10 +71,73 @@
                             <constraint firstItem="LK1-oz-ktv" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="woQ-Na-NS7"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="settingsButton" destination="gb9-cL-D7F" id="4m9-gs-me7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="29.600000000000001" y="88.605697151424295"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="9sg-8Y-GyD">
+            <objects>
+                <viewController id="lbK-4U-RCW" customClass="MEDLSettingsViewController" customModule="MEDL_Reference_App" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Z0c-1q-iut"/>
+                        <viewControllerLayoutGuide type="bottom" id="Fpu-wt-mJQ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="fjA-CN-pSz">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kpu-cM-7RB">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <color key="barTintColor" red="1" green="0.60532481869999999" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <textAttributes key="titleTextAttributes">
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </textAttributes>
+                                <items>
+                                    <navigationItem title="MEDL" id="rqd-an-FEs">
+                                        <barButtonItem key="leftBarButtonItem" title="Back" id="1Ge-DY-vbc">
+                                            <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <connections>
+                                                <action selector="backAction:" destination="lbK-4U-RCW" id="zMY-JD-hJi"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="barPosition">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </navigationBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="D71-Mb-dxK">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="lbK-4U-RCW" id="bl1-J3-wUY"/>
+                                    <outlet property="delegate" destination="lbK-4U-RCW" id="uCJ-mM-RoV"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="kpu-cM-7RB" secondAttribute="trailing" id="0HB-Dv-pra"/>
+                            <constraint firstItem="kpu-cM-7RB" firstAttribute="top" secondItem="Z0c-1q-iut" secondAttribute="bottom" id="2TD-qM-RYa"/>
+                            <constraint firstItem="kpu-cM-7RB" firstAttribute="leading" secondItem="fjA-CN-pSz" secondAttribute="leading" id="ibx-1n-wr2"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="backButton" destination="1Ge-DY-vbc" id="KC2-Ft-jd5"/>
+                        <outlet property="tableView" destination="D71-Mb-dxK" id="hCE-EH-Cik"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="XcW-RX-c3X" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="749.60000000000002" y="88.605697151424295"/>
         </scene>
     </scenes>
     <resources>

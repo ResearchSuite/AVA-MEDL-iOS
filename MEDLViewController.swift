@@ -25,8 +25,6 @@ class MEDLViewController: UIViewController {
     var medlFullAssessmentItem: RSAFScheduleItem!
     var medlSpotAssessmentItem: RSAFScheduleItem!
     
-    @IBOutlet
-    var tableView: UITableView!
     
     override func viewDidLoad() {
         

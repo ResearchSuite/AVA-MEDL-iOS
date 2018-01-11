@@ -85,7 +85,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         self.store = RSStore()
-        self.ohmageManager = self.initializeOhmage(credentialsStore: self.store)
         self.store.setValueInState(value: true as NSSecureCoding, forKey: "shouldDoSpot")
         
         self.taskBuilder = RSTBTaskBuilder(
@@ -101,11 +100,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             frontEndTransformers: AppDelegate.resultsTransformers,
             backEnd: self.CSVBackend
         )
-        
-//        self.resultsProcessor = RSRPResultsProcessor(
-//            frontEndTransformers: AppDelegate.resultsTransformers,
-//            backEnd: ORBEManager(ohmageManager: self.ohmageManager)
-//        )
         
         
         if #available(iOS 10.0, *) {
