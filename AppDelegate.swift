@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var ohmageManager: OhmageOMHManager!
     var taskBuilder: RSTBTaskBuilder!
     var resultsProcessor: RSRPResultsProcessor!
-    
+    var CSVBackend: RSRPCSVBackEnd!
     
     @available(iOS 10.0, *)
     var center: UNUserNotificationCenter!{
@@ -75,6 +75,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Override point for customization after application launch.
         
         
+        let documentsPath = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+        let logsPath = documentsPath.appendingPathComponent("data")
+        print(logsPath!)
+        do {
+            try FileManager.default.createDirectory(atPath: logsPath!.path, withIntermediateDirectories: true, attributes: nil)
+        } catch let error as NSError {
+            NSLog("Unable to create directory \(error.debugDescription)")
+        }
         
         self.store = RSStore()
         self.ohmageManager = self.initializeOhmage(credentialsStore: self.store)
@@ -87,10 +95,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             answerFormatGeneratorServices: AppDelegate.answerFormatGeneratorServices
         )
         
+        
+        self.CSVBackend = RSRPCSVBackEnd(outputDirectory: documentsPath as URL)
         self.resultsProcessor = RSRPResultsProcessor(
             frontEndTransformers: AppDelegate.resultsTransformers,
-            backEnd: ORBEManager(ohmageManager: self.ohmageManager)
+            backEnd: self.CSVBackend
         )
+        
+//        self.resultsProcessor = RSRPResultsProcessor(
+//            frontEndTransformers: AppDelegate.resultsTransformers,
+//            backEnd: ORBEManager(ohmageManager: self.ohmageManager)
+//        )
         
         
         if #available(iOS 10.0, *) {
@@ -219,6 +234,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Make sure to include any result transforms for custom steps here
     open class var resultsTransformers: [RSRPFrontEndTransformer.Type] {
         return [
+            MEDLFullRaw.self,
+            MEDLSpotRaw.self,
             YADLFullRaw.self,
             YADLSpotRaw.self,
             CTFBARTSummaryResultsTransformer.self,

@@ -127,6 +127,18 @@
                         ]
     },
     "resultTransforms": [
+                         {
+                         "transform": "MEDLSpotRaw",
+                         "inputMapping": [
+                                          {"parameter":"result", "stepIdentifier":"medl_spot"},
+                                          {"parameter": "schemaID", "constant":{
+                                          "namespace": "Cornell",
+                                          "name": "medl-spot-assessment",
+                                          "version": "1.0"
+                                          }
+                                          }
+                                          ]
+                         }
     ]
     
     

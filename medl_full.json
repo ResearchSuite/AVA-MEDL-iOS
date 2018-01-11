@@ -120,7 +120,22 @@
                         
                         ]
     },
-    "resultTransforms": [
+    "resultTransforms": [{
+                         "transform": "MEDLFullRaw",
+                         "inputMapping": [
+                                          {"parameter":"NSAID", "stepIdentifier":"medl_full.NSAID"},
+                                          {"parameter":"Muscle Relaxants", "stepIdentifier":"medl_full.Muscle Relaxants"},
+                                          {"parameter":"Opioids", "stepIdentifier":"medl_full.Opioids"},
+                                          {"parameter":"Activities", "stepIdentifier":"medl_full.Activities"},
+                                          {"parameter": "schemaID", "constant":{
+                                          "namespace": "Cornell",
+                                          "name": "medl-full-assessment-dance",
+                                          "version": "1.0"
+                                          }
+                                          }
+                                          ]
+                         }
+    
     
     ]
 }
