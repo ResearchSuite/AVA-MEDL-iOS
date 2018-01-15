@@ -12,8 +12,11 @@ import ResearchSuiteTaskBuilder
 import Gloss
 import ResearchSuiteAppFramework
 import UserNotifications
+import MessageUI
+import ResearchSuiteResultsProcessor
+import sdlrkx
 
-class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, MFMailComposeViewControllerDelegate {
     
     @IBOutlet
     var tableView: UITableView!
@@ -22,7 +25,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     
     @IBOutlet weak var backButton: UIBarButtonItem!
     
-    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Assessment Data","Sign out"]
+    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Full Assessment Data", "Email Spot Assessment Data","Sign out"]
     var fullAssessmentItem: RSAFScheduleItem!
     var spotAssessmentItem: RSAFScheduleItem!
     var notificationItem: RSAFScheduleItem!
@@ -46,6 +49,11 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func getAttachment () {
+        
+        let attach = delegate.CSVBackend.getFileURLForType(typeIdentifier: "MEDLFull")
     }
     
     
@@ -110,10 +118,14 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         }
         
         if indexPath.row == 3 {
-            self.sendEmail()
+            self.sendFullEmail()
         }
         
         if indexPath.row == 4 {
+            self.sendSpotEmail()
+        }
+        
+        if indexPath.row == 5 {
             self.signOut()
         }
         
@@ -134,8 +146,105 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         self.launchActivity(forItem: notificationItem)
     }
     
-    func sendEmail() {
+    func sendFullEmail() {
         
+        let mailComposeViewController = configuredFullMailComposeViewController()
+        if MFMailComposeViewController.canSendMail() {
+            self.present(mailComposeViewController, animated: true, completion: nil)
+        } else {
+            self.showSendMailErrorAlert()
+        }
+        
+        self.deleteFullFile()
+    }
+    
+    func sendSpotEmail () {
+        let mailComposeViewController = configuredSpotMailComposeViewController()
+        if MFMailComposeViewController.canSendMail() {
+            self.present(mailComposeViewController, animated: true, completion: nil)
+        } else {
+            self.showSendMailErrorAlert()
+        }
+        
+        self.deleteSpotFile()
+    }
+    
+    func deleteSpotFile() {
+        delegate.CSVBackend.removeFileForType(type: MEDLSpotRaw.self)
+       // delegate.CSVBackend.removeFileForType(type: MEDLFullRaw.kType)
+    }
+    
+    func deleteFullFile() {
+        delegate.CSVBackend.removeFileForType(type: MEDLFullRaw.self)
+       // delegate.CSVBackend.removeFileForType(type: "MEDLFull")
+    }
+    
+    func configuredSpotMailComposeViewController() -> MFMailComposeViewController {
+        let mailComposerVC = MFMailComposeViewController()
+        mailComposerVC.mailComposeDelegate = self
+        
+        mailComposerVC.setToRecipients([""])
+        mailComposerVC.setSubject("MEDL Spot Data")
+        mailComposerVC.setMessageBody("", isHTML: false)
+        
+        
+        let attach = delegate.CSVBackend.getFileURLForType(typeIdentifier: "MEDLSpot")
+        
+        do {
+            
+            if FileManager.default.fileExists(atPath: (attach?.path)!){
+                let cert = try NSData(contentsOfFile: (attach?.path)!)  as Data
+                
+                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MedlSpot")
+                
+                return mailComposerVC
+                
+            }
+        } catch {
+            print(error)
+        }
+        
+        
+        return mailComposerVC
+    }
+    
+    func configuredFullMailComposeViewController() -> MFMailComposeViewController {
+        let mailComposerVC = MFMailComposeViewController()
+        mailComposerVC.mailComposeDelegate = self
+        
+        mailComposerVC.setToRecipients([""])
+        mailComposerVC.setSubject("MEDL Full Data")
+        mailComposerVC.setMessageBody("", isHTML: false)
+        
+        
+        let attach = delegate.CSVBackend.getFileURLForType(typeIdentifier: "MEDLFull")
+        
+        do {
+           
+            if FileManager.default.fileExists(atPath: (attach?.path)!){
+                let cert = try NSData(contentsOfFile: (attach?.path)!)  as Data
+                
+                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MEDLFull")
+                
+                return mailComposerVC
+                
+            }
+        } catch {
+            print(error)
+        }
+        
+        
+        return mailComposerVC
+    }
+    
+    func showSendMailErrorAlert() {
+        let sendMailErrorAlert = UIAlertView(title: "Could Not Send Email", message: "Your device could not send e-mail.  Please check e-mail configuration and try again.", delegate: self, cancelButtonTitle: "OK")
+        sendMailErrorAlert.show()
+    }
+    
+    // MARK: MFMailComposeViewControllerDelegate Method
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
     }
     
     func signOut() {
