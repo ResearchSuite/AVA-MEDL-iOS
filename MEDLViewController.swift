@@ -31,7 +31,7 @@ class MEDLViewController: UIViewController {
         super.viewDidLoad()
         
         self.store = RSStore()
-        
+              
         
     }
     
@@ -92,13 +92,19 @@ class MEDLViewController: UIViewController {
         let taskFinishedHandler: ((ORKTaskViewController, ORKTaskViewControllerFinishReason, Error?) -> ()) = { [weak self] (taskViewController, reason, error) in
             //when finised, if task was successful (e.g., wasn't canceled)
             //process results
+            
+            if reason == ORKTaskViewControllerFinishReason.discarded {
+                self?.store.setValueInState(value: false as NSSecureCoding, forKey: "shouldDoSpot")
+            }
+            
             if reason == ORKTaskViewControllerFinishReason.completed {
                 let taskResult = taskViewController.result
                 appDelegate.resultsProcessor.processResult(taskResult: taskResult, resultTransforms: item.resultTransforms)
                 
                 if(item.identifier == "medl_spot") {
-                    self?.store.set(value: false as NSSecureCoding, key: "shouldDoSpot")
                     
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "spotFileExists")
+                    self?.store.setValueInState(value: false as NSSecureCoding, forKey: "shouldDoSpot")
                 }
                 
                 
@@ -107,6 +113,7 @@ class MEDLViewController: UIViewController {
                     let date = Date()
                     
                     self?.store.setValueInState(value: date as NSSecureCoding, forKey: "fullDate")
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "fullFileExists")
 
                     
                     var chosen : [String] = []
@@ -138,6 +145,7 @@ class MEDLViewController: UIViewController {
                     
                 }
             }
+            
             
             self?.dismiss(animated: true, completion: nil)
         }

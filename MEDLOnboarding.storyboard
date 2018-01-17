@@ -75,4 +75,5 @@
     <resources>
         <image name="medl_icon" width="314" height="248"/>
     </resources>
+    <color key="tintColor" red="1" green="0.60532481869999999" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

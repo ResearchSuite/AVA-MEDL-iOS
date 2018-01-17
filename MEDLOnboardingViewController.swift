@@ -31,11 +31,11 @@ class MEDLOnboardingViewController: UIViewController {
         
         self.store = RSStore()
         
-//        let color = UIColor.init(colorLiteralRed: 0.44, green: 0.66, blue: 0.86, alpha: 1.0)
-//        startButton.layer.borderWidth = 1.0
-//        startButton.layer.borderColor = color.cgColor
-//        startButton.layer.cornerRadius = 5
-//        startButton.clipsToBounds = true
+        let color = UIColor(red:1.00, green:0.67, blue:0.00, alpha:1.0)
+        startButton.layer.borderWidth = 1.0
+        startButton.layer.borderColor = color.cgColor
+        startButton.layer.cornerRadius = 5
+        startButton.clipsToBounds = true
 
         // Do any additional setup after loading the view.
     }
@@ -76,6 +76,11 @@ class MEDLOnboardingViewController: UIViewController {
                     let resultAnswer = timeAnswer?.dateComponentsAnswer
                     self?.setNotification(resultAnswer: resultAnswer!)
                     
+                    
+                }
+                if(item.identifier == "medl_spot") {
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "spotFileExists")
+                    self?.store.set(value: true as NSSecureCoding, key: "signedIn")
                 }
                 
                 
@@ -84,6 +89,10 @@ class MEDLOnboardingViewController: UIViewController {
                     let date = Date()
                     
                     self?.store.setValueInState(value: date as NSSecureCoding, forKey: "dateFull")
+                    
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "fullFileExists")
+                    
+
 
                     var chosen : [String] = []
                     

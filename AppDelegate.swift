@@ -75,6 +75,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Override point for customization after application launch.
         
         
+        window?.tintColor = UIColor(red:1.00, green:0.60, blue:0.00, alpha:1.0)
+        
         let documentsPath = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
         let logsPath = documentsPath.appendingPathComponent("data")
         print(logsPath!)
@@ -86,6 +88,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         self.store = RSStore()
         self.store.setValueInState(value: true as NSSecureCoding, forKey: "shouldDoSpot")
+        
+        guard let isSignedIn = self.store.get(key: "signedIn") else {
+            self.store.set(value: false as NSSecureCoding, key: "signedIn")
+            return false
+        }
         
         self.taskBuilder = RSTBTaskBuilder(
             stateHelper: self.store,
@@ -154,30 +161,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
     
+    func signedIn () -> Bool {
+        let isSignedIn = self.store.valueInState(forKey: "signedIn") as! Bool
+        
+        return isSignedIn
+    }
+    
     open func showViewController(animated: Bool) {
         
-        let storyboard = UIStoryboard(name: "MEDLOnboarding", bundle: Bundle.main)
-        let vc = storyboard.instantiateInitialViewController()
-        self.transition(toRootViewController: vc!, animated: animated)
+        if(signedIn()) {
+            let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+            let vc = storyboard.instantiateInitialViewController()
+            self.transition(toRootViewController: vc!, animated: animated)
+
+        }
+        else {
+            let storyboard = UIStoryboard(name: "MEDLOnboarding", bundle: Bundle.main)
+            let vc = storyboard.instantiateInitialViewController()
+            self.transition(toRootViewController: vc!, animated: animated)
+        }
         
-        //if not signed in, go to sign in screen
-        //        if !self.ohmageManager.isSignedIn {
-        //
-        //            let storyboard = UIStoryboard(name: "Onboarding", bundle: Bundle.main)
-        //            let vc = storyboard.instantiateInitialViewController()
-        //            self.transition(toRootViewController: vc!, animated: animated)
-        //
-        //        }
-        
-        // if signed in, go to main home screen
-        //        else {
-        //
-        //            let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        //            let vc = storyboard.instantiateInitialViewController()
-        //            self.transition(toRootViewController: vc!, animated: animated)
-        //
-        //        }
+       
     }
+    
     
     // Make sure to include all step generators needed for your survey steps here
     open class var stepGeneratorServices: [RSTBStepGenerator] {

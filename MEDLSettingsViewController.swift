@@ -25,7 +25,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     
     @IBOutlet weak var backButton: UIBarButtonItem!
     
-    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Full Assessment Data", "Email Spot Assessment Data","Sign out"]
+    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Full Assessment Data", "Email Spot Assessment Data"]
     var fullAssessmentItem: RSAFScheduleItem!
     var spotAssessmentItem: RSAFScheduleItem!
     var notificationItem: RSAFScheduleItem!
@@ -50,12 +50,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func getAttachment () {
-        
-        let attach = delegate.CSVBackend.getFileURLForType(typeIdentifier: "MEDLFull")
-    }
-    
+
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.items.count
@@ -88,7 +83,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
             cell.textLabel?.text = self.items[indexPath.row]
         }
         
-        cell.textLabel?.textColor = UIColor.init(colorLiteralRed: 0.44, green: 0.66, blue: 0.86, alpha: 1.0)
+        cell.textLabel?.textColor = UIColor(red:0.00, green:0.00, blue:0.00, alpha:1.0)
         
         
         return cell
@@ -118,16 +113,28 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         }
         
         if indexPath.row == 3 {
-            self.sendFullEmail()
+            let shouldSendFullEmail = self.store.valueInState(forKey: "fullFileExists") as! Bool
+            if(shouldSendFullEmail){
+                self.sendFullEmail()
+            }
+            else {
+                let sendMailErrorAlert = UIAlertView(title: "No Full Assessment Saved", message: "Please retake a Full Assessment", delegate: self, cancelButtonTitle: "OK")
+                sendMailErrorAlert.show()
+            }
+
         }
         
         if indexPath.row == 4 {
-            self.sendSpotEmail()
+            let shouldSendSpotEmail = self.store.valueInState(forKey: "spotFileExists") as! Bool
+            if(shouldSendSpotEmail){
+                self.sendSpotEmail()
+            }
+            else {
+                let sendMailErrorAlert = UIAlertView(title: "No Spot Assessment Saved", message: "Please retake a Spot Assessment", delegate: self, cancelButtonTitle: "OK")
+                sendMailErrorAlert.show()
+            }
         }
-        
-        if indexPath.row == 5 {
-            self.signOut()
-        }
+
         
     }
     
@@ -148,6 +155,9 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     
     func sendFullEmail() {
         
+        self.store.setValueInState(value: true as NSSecureCoding, forKey: "sendingFull")
+        self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingSpot")
+        
         let mailComposeViewController = configuredFullMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
             self.present(mailComposeViewController, animated: true, completion: nil)
@@ -155,10 +165,14 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
             self.showSendMailErrorAlert()
         }
         
-        self.deleteFullFile()
+       
     }
     
     func sendSpotEmail () {
+        
+        self.store.setValueInState(value: true as NSSecureCoding, forKey: "sendingSpot")
+        self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingFull")
+        
         let mailComposeViewController = configuredSpotMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
             self.present(mailComposeViewController, animated: true, completion: nil)
@@ -166,7 +180,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
             self.showSendMailErrorAlert()
         }
         
-        self.deleteSpotFile()
+       
     }
     
     func deleteSpotFile() {
@@ -195,7 +209,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
             if FileManager.default.fileExists(atPath: (attach?.path)!){
                 let cert = try NSData(contentsOfFile: (attach?.path)!)  as Data
                 
-                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MedlSpot")
+                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MedlSpot.csv")
                 
                 return mailComposerVC
                 
@@ -224,7 +238,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
             if FileManager.default.fileExists(atPath: (attach?.path)!){
                 let cert = try NSData(contentsOfFile: (attach?.path)!)  as Data
                 
-                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MEDLFull")
+                mailComposerVC.addAttachmentData(cert as Data, mimeType: "text/csv", fileName: "MEDLFull.csv")
                 
                 return mailComposerVC
                 
@@ -244,11 +258,45 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     
     // MARK: MFMailComposeViewControllerDelegate Method
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        let sendingSpot = self.store.valueInState(forKey: "sendingSpot") as! Bool
+        let sendingFull = self.store.valueInState(forKey: "sendingFull") as! Bool
+        
+        if(result == MFMailComposeResult.sent){
+            
+            if (sendingSpot){
+                self.deleteSpotFile()
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "spotFileExists")
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingSpot")
+                
+            }
+            if (sendingFull){
+                self.deleteFullFile()
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "fullFileExists")
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingFull")
+            }
+        }
+            
+        else {
+            if (sendingSpot){
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingSpot")
+            }
+            if (sendingFull){
+                self.store.setValueInState(value: false as NSSecureCoding, forKey: "sendingFull")
+            }
+        }
+        
         controller.dismiss(animated: true, completion: nil)
     }
     
     func signOut() {
-        
+//        self.store.setValueInState(value: false as NSSecureCoding, forKey: "signedIn")
+//        self.store.reset()
+//        self.deleteFullFile()
+//        self.deleteSpotFile()
+//        let storyboard = UIStoryboard(name: "MEDLOnboarding", bundle: Bundle.main)
+//        let vc = storyboard.instantiateInitialViewController()
+//        self.delegate.transition(toRootViewController: vc!, animated: true)
     }
     
     func launchActivity(forItem item: RSAFScheduleItem) {
@@ -280,12 +328,19 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
                     
                 }
                 
+                if(item.identifier == "medl_spot"){
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "spotFileExists")
+                }
+                
                 if(item.identifier == "medl_full"){
                     
                     let date = Date()
                     
                     self?.store.setValueInState(value: date as NSSecureCoding, forKey: "fullDate")
                     
+                    // save that a full file exists
+                    
+                    self?.store.setValueInState(value: true as NSSecureCoding, forKey: "fullFileExists")
                     
                     var chosen : [String] = []
                     
