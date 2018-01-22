@@ -89,9 +89,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.store = RSStore()
         self.store.setValueInState(value: true as NSSecureCoding, forKey: "shouldDoSpot")
         
-        guard let isSignedIn = self.store.get(key: "signedIn") else {
+        let key = self.store.get(key:"signedIn")
+        
+        if key == nil {
             self.store.set(value: false as NSSecureCoding, key: "signedIn")
-            return false
+
         }
         
         self.taskBuilder = RSTBTaskBuilder(
