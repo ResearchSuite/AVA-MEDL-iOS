@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="uap-Ea-zyQ">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Passcode View Controller-->
+        <scene sceneID="Qg5-w4-6hZ">
+            <objects>
+                <viewController id="uap-Ea-zyQ" customClass="PasscodeViewController" customModule="MEDL_Reference_App" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dmH-Rz-clU">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="medl_icon" translatesAutoresizingMaskIntoConstraints="NO" id="6z5-AT-Gn2">
+                                <rect key="frame" x="112.5" y="251" width="150" height="116"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="I8S-ae-5jV"/>
+                                    <constraint firstAttribute="height" constant="116" id="zu7-Op-xpA"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Aue-7d-UKU">
+                                <rect key="frame" x="134.5" y="420" width="106" height="43"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="106" id="fxe-vD-2Fc"/>
+                                    <constraint firstAttribute="height" constant="43" id="szR-af-Gu5"/>
+                                </constraints>
+                                <state key="normal" title="Start">
+                                    <color key="titleColor" red="1" green="0.60532481869999999" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="startButtonAction:" destination="uap-Ea-zyQ" eventType="touchUpInside" id="8FG-5G-aqp"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Hi! 👋👋 Welcome to MEDL" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pgy-DM-hyo">
+                                <rect key="frame" x="112.5" y="129" width="150" height="59"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="59" id="NPH-58-1IT"/>
+                                    <constraint firstAttribute="width" constant="150" id="Wri-6c-hxt"/>
+                                </constraints>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="6z5-AT-Gn2" firstAttribute="centerX" secondItem="dmH-Rz-clU" secondAttribute="centerX" id="9CG-P8-TLI"/>
+                            <constraint firstItem="pgy-DM-hyo" firstAttribute="centerX" secondItem="dmH-Rz-clU" secondAttribute="centerX" id="M4M-Tx-7jh"/>
+                            <constraint firstItem="Aue-7d-UKU" firstAttribute="centerX" secondItem="dmH-Rz-clU" secondAttribute="centerX" id="l5A-47-wbj"/>
+                            <constraint firstItem="pgy-DM-hyo" firstAttribute="top" secondItem="BtC-Gx-ok8" secondAttribute="top" constant="109" id="ogc-tA-Mgr"/>
+                            <constraint firstItem="Aue-7d-UKU" firstAttribute="top" secondItem="6z5-AT-Gn2" secondAttribute="bottom" constant="52.5" id="xjy-7S-RoC"/>
+                            <constraint firstItem="6z5-AT-Gn2" firstAttribute="top" secondItem="pgy-DM-hyo" secondAttribute="bottom" constant="63.5" id="yEr-8h-2as"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="BtC-Gx-ok8"/>
+                    </view>
+                    <connections>
+                        <outlet property="startButton" destination="Aue-7d-UKU" id="sN7-b2-Vc2"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YlL-ax-XM0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-553" y="-162"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="medl_icon" width="314" height="248"/>
+    </resources>
+</document>

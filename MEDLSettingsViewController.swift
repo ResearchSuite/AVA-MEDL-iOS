@@ -25,7 +25,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     
     @IBOutlet weak var backButton: UIBarButtonItem!
     
-    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Full Assessment Data", "Email Spot Assessment Data"]
+    var items: [String] = ["Take Full Assessment", "Take Spot Assessment","Set Notification Time","Email Full Assessment Data", "Email Spot Assessment Data","Sign Out"]
     var fullAssessmentItem: RSAFScheduleItem!
     var spotAssessmentItem: RSAFScheduleItem!
     var notificationItem: RSAFScheduleItem!
@@ -115,7 +115,7 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         if indexPath.row == 3 {
             let shouldSendFullEmail = self.store.valueInState(forKey: "fullFileExists") as! Bool
             if(shouldSendFullEmail){
-                self.sendFullEmail()
+                self.getSendFullConsent()
             }
             else {
                 let sendMailErrorAlert = UIAlertView(title: "No Full Assessment Saved", message: "Please retake a Full Assessment", delegate: self, cancelButtonTitle: "OK")
@@ -127,12 +127,16 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         if indexPath.row == 4 {
             let shouldSendSpotEmail = self.store.valueInState(forKey: "spotFileExists") as! Bool
             if(shouldSendSpotEmail){
-                self.sendSpotEmail()
+                self.getSendSpotConsent()
             }
             else {
                 let sendMailErrorAlert = UIAlertView(title: "No Spot Assessment Saved", message: "Please retake a Spot Assessment", delegate: self, cancelButtonTitle: "OK")
                 sendMailErrorAlert.show()
             }
+        }
+        
+        if indexPath.row == 5 {
+            self.signOut()
         }
 
         
@@ -153,6 +157,20 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         self.launchActivity(forItem: notificationItem)
     }
     
+    func getSendFullConsent() {
+        let alertController = UIAlertController(title: "You can email all of your responses to AVA MEDL Full Assessment to anyone you like in one easy to read file.", message: "Please be mindful of your privacy: this email will use your email provider, will contain all of your responses in this app since you installed it, and once the email is sent it cannot be undone.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel) { (result : UIAlertAction) -> Void in
+            
+        }
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
+            self.sendFullEmail()
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     func sendFullEmail() {
         
         self.store.setValueInState(value: true as NSSecureCoding, forKey: "sendingFull")
@@ -166,6 +184,20 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
         }
         
        
+    }
+    
+    func getSendSpotConsent() {
+        let alertController = UIAlertController(title: "You can email all of your responses to AVA MEDL Spot Assessment to anyone you like in one easy to read file.", message: "Please be mindful of your privacy: this email will use your email provider, will contain all of your responses in this app since you installed it, and once the email is sent it cannot be undone.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel) { (result : UIAlertAction) -> Void in
+            
+        }
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
+            self.sendSpotEmail()
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     func sendSpotEmail () {
@@ -290,13 +322,10 @@ class MEDLSettingsViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     func signOut() {
-//        self.store.setValueInState(value: false as NSSecureCoding, forKey: "signedIn")
-//        self.store.reset()
-//        self.deleteFullFile()
-//        self.deleteSpotFile()
-//        let storyboard = UIStoryboard(name: "MEDLOnboarding", bundle: Bundle.main)
-//        let vc = storyboard.instantiateInitialViewController()
-//        self.delegate.transition(toRootViewController: vc!, animated: true)
+       // UserDefaults.standard.set(false, forKey: "PassCreated")
+        let storyboard = UIStoryboard(name: "SignOut", bundle: Bundle.main)
+        let vc = storyboard.instantiateInitialViewController()
+        self.delegate.transition(toRootViewController: vc!, animated: true)
     }
     
     func launchActivity(forItem item: RSAFScheduleItem) {

@@ -69,6 +69,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.transition(toRootViewController: vc!, animated: true)
     }
     
+    func applicationDidFinishLaunching(_ application: UIApplication) {
+        if !UserDefaults.standard.bool(forKey: "PassCreated") {
+            UserDefaults.standard.set(false, forKey: "PassCreated")
+        }
+    }
+    
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -88,13 +94,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         self.store = RSStore()
         self.store.setValueInState(value: true as NSSecureCoding, forKey: "shouldDoSpot")
-        
-        let key = self.store.get(key:"signedIn")
-        
-        if key == nil {
-            self.store.set(value: false as NSSecureCoding, key: "signedIn")
-
-        }
+        self.store.set(value: true as NSSecureCoding, key: "shouldDoNotif")
         
         self.taskBuilder = RSTBTaskBuilder(
             stateHelper: self.store,
@@ -163,25 +163,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
     
-    func signedIn () -> Bool {
-        let isSignedIn = self.store.valueInState(forKey: "signedIn") as! Bool
-        
-        return isSignedIn
-    }
     
     open func showViewController(animated: Bool) {
-        
-        if(signedIn()) {
+        if UserDefaults.standard.bool(forKey: "PassCreated"){
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
             let vc = storyboard.instantiateInitialViewController()
             self.transition(toRootViewController: vc!, animated: animated)
-
         }
         else {
-            let storyboard = UIStoryboard(name: "MEDLOnboarding", bundle: Bundle.main)
+            let storyboard = UIStoryboard(name: "PasscodeStoryboard", bundle: Bundle.main)
             let vc = storyboard.instantiateInitialViewController()
             self.transition(toRootViewController: vc!, animated: animated)
+        
         }
+
         
        
     }

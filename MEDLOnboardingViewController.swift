@@ -16,9 +16,9 @@ import UserNotifications
 import sdlrkx
 
 
-class MEDLOnboardingViewController: UIViewController {
+class MEDLOnboardingViewController: UIViewController{
     
-    @IBOutlet weak var startButton: UIButton!
+    
     let kActivityIdentifiers = "activity_identifiers"
     var notifItem: RSAFScheduleItem!
     var medlFullAssessmentItem: RSAFScheduleItem!
@@ -31,13 +31,23 @@ class MEDLOnboardingViewController: UIViewController {
         
         self.store = RSStore()
         
-        let color = UIColor(red:1.00, green:0.67, blue:0.00, alpha:1.0)
-        startButton.layer.borderWidth = 1.0
-        startButton.layer.borderColor = color.cgColor
-        startButton.layer.cornerRadius = 5
-        startButton.clipsToBounds = true
+       
+        
+        
 
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        let shouldSetNotif = self.store.valueInState(forKey: "shouldDoNotif") as! Bool
+        
+        if(shouldSetNotif){
+            self.notifItem = AppDelegate.loadScheduleItem(filename: "notification")
+            self.launchActivity(forItem: (self.notifItem)!)
+        }
+        
+       
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,12 +55,10 @@ class MEDLOnboardingViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func startAction(_ sender: Any) {
-        
-        self.notifItem = AppDelegate.loadScheduleItem(filename: "notification")
-        self.launchActivity(forItem: (self.notifItem)!)
-    }
+ 
     
+
+//
     func launchActivity(forItem item: RSAFScheduleItem) {
         
         
@@ -68,6 +76,8 @@ class MEDLOnboardingViewController: UIViewController {
                 let taskResult = taskViewController.result
                 appDelegate.resultsProcessor.processResult(taskResult: taskResult, resultTransforms: item.resultTransforms)
                 
+
+                
                 if(item.identifier == "notification_date"){
                     
                     let result = taskResult.stepResult(forStepIdentifier: "notification_time_picker")
@@ -75,6 +85,8 @@ class MEDLOnboardingViewController: UIViewController {
                     
                     let resultAnswer = timeAnswer?.dateComponentsAnswer
                     self?.setNotification(resultAnswer: resultAnswer!)
+                    
+                    self?.store.set(value: false as NSSecureCoding, key: "shouldDoNotif")
                     
                     
                 }
@@ -128,7 +140,7 @@ class MEDLOnboardingViewController: UIViewController {
             
             self?.dismiss(animated: true, completion: {
                 
-                
+
                 if(item.identifier == "notification_date"){
                     
                     self!.medlFullAssessmentItem = AppDelegate.loadScheduleItem(filename:"medl_full")
